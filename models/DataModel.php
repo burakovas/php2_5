@@ -8,25 +8,25 @@ abstract class DataModel implements IModel
     private $db;
 
     public function __construct(){
-        $this->db = Db::getInstance();
+        $this->db = static::getDb();
     }
 
     public function getOne($id){
         $table = $this->getTableName();
         $sql = "SELECT * FROM {$table} WHERE id = :id";
-        return $this->db->queryObject($sql, [':id' => $id], get_called_class());
+        return static::getDb()->queryObject($sql, [':id' => $id], get_called_class());
     }
 
     public function getAll(){
         $table = $this->getTableName();
         $sql = "SELECT * FROM {$table}";
-        return $this->db->queryAll($sql);
+        return static::getDb()->queryAll($sql);
     }
 
     public function delete($id){
         $table = $this->getTableName();
         $sql = "DELETE FROM {$table} WHERE id = :id";
-        return $this->db->execute($sql, [':id' => $id]);
+        return static::getDb()->execute($sql, [':id' => $id]);
     }
 
     public function save(){
@@ -35,6 +35,10 @@ abstract class DataModel implements IModel
         } else {
             $this->update();
         }
+    }
+
+    static function GetDb(){
+        return Db::getInstance();
     }
 
     public function insert(){
@@ -51,8 +55,8 @@ abstract class DataModel implements IModel
         $columns = implode(", ", $columns);
         $placeholders = implode(", ", array_keys($params));
         $sql = "INSERT INTO  `{$table}` ({$columns}) VALUES ({$placeholders})";
-        $this->db->execute($sql,$params);
-        $this->id = $this->db->lastInsertId();
+        static::getDb()->execute($sql,$params);
+        $this->id = static::getDb()->lastInsertId();
     }
 
     public function update(){
@@ -68,7 +72,7 @@ abstract class DataModel implements IModel
         }
         $placeholders = implode(", ", array_keys($params));
         $sql = "UPDATE {$table} SET {$placeholders} WHERE (id = {$this->id});";
-        $this->db->execute($sql, $columns);
+        static::getDb()->execute($sql, $columns);
 
     }
 }

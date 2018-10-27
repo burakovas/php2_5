@@ -1,9 +1,7 @@
 <?php
 include $_SERVER['DOCUMENT_ROOT'] . "/../config/main.php";
 include $_SERVER['DOCUMENT_ROOT'] . "/../services/Autoloader.php";
-
-
-// сделать save, выборочный update - только изменившихся полей, контроллер корзины с 1 экшном - вывод корзины
+include ROOT_DIR . 'vendor/autoload.php'; 
 
 spl_autoload_register([new \app\services\Autoloader(), 'loadClass']);
 
@@ -13,6 +11,9 @@ $actionName = $_GET['a'];
 $controllerClass = CONTROLLERS_NAMESPACE . "\\" . ucfirst($controllerName) . "Controller";
 
 if(class_exists($controllerClass)){
-  $controller = new $controllerClass;
+  $controller = new $controllerClass(
+    new \app\services\renderers\TemplateRenderer()
+    //new \app\services\renderers\TwigRenderer()
+  );
   $controller->run($actionName);
 }
